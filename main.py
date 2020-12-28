@@ -5,7 +5,7 @@ import random
 class Snake:
     def __init__(self):
         self.snakeList = []
-        self.snakeLength = 1
+        self.snakeLength = 0
         self.clock = pygame.time.Clock()
         self.colour_point = (187, 75, 129)
         self.colour_player = (80, 128, 167)
@@ -20,10 +20,10 @@ class Snake:
         pos_x_change = 0
         pos_y_change = 0
         speed = 10
-        #Maingame loop
+        # Maingame loop
         while True:
             pygame.display.update()
-            #Program waits for userinput
+            # Program waits for userinput
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -43,17 +43,17 @@ class Snake:
                         pos_y_change = 0
 
             self.clock.tick(30)
-            #Changing the position of the snake
+            # Changing the position of the snake
             self.player_pos_y += pos_y_change
             self.player_pos_x += pos_x_change
 
-            #If the snake hits any of the borders the game is over
-            if self.player_pos_x > width - heigth_fence - player_size or self.player_pos_x < 50:
-                quit()
-            elif self.player_pos_y > width - heigth_fence - player_size or self.player_pos_y < 50:
-                quit()
+            # If the snake hits any of the borders the game is over
+            if self.player_pos_x > size - heigth_fence - player_size or self.player_pos_x < heigth_fence:
+                self.end_text()
+            elif self.player_pos_y > size - heigth_fence - player_size or self.player_pos_y < heigth_fence:
+                self.end_text()
 
-            #If the player collides with the point the snake is
+            # If the player collides with the point the snake is
             if self.player.colliderect(self.point):
                 self.point_init()
                 self.snakeLength += 10
@@ -68,58 +68,80 @@ class Snake:
 
             for snakeElement in self.snakeList[:-1]:
                 if snakeElement == snake_head:
-                    quit()
+                    self.end_text()
 
             self.update()
 
+    # Updating the background and the snake, due to the movement
+    def update_background(self):
+        screen.fill(colour_back)
+        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, 0, size, heigth_fence))
+        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, size - heigth_fence, size, heigth_fence))
+
+        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, heigth_fence, heigth_fence, size))
+        pygame.draw.rect(screen, colour_rec, pygame.Rect(size - heigth_fence, 0, heigth_fence, size))
+
+        image_grass = pygame.image.load("pictures/grass.png")
+        image_grass = pygame.transform.scale(image_grass, (100, 100))
+        image_rock = pygame.image.load("pictures/rock.png")
+        image_rock = pygame.transform.scale(image_rock, (100, 100))
+        screen.blit(image_rock, (200, 200))
+        screen.blit(image_grass, (400, 500))
+
+        font = pygame.font.SysFont("comicsans", 20)
+        text = font.render(("Points: " + str(self.snakeLength)), True, (255, 255, 255))
+        screen.blit(text, (10, 10))
+
+    def end_text(self):
+        font = pygame.font.SysFont("comicsans", 50)
+        text = font.render("You failed!", True, (255, 0, 0))
+        screen.blit(text, (100, 100))
+        text = font.render(("Points: " + str(self.snakeLength)), True, (255, 0, 0))
+        screen.blit(text, (100, 140))
+        pygame.display.update()
+        pygame.time.wait(5000)
+        quit()
+
+    # Initialise the snake
     def char_init(self):
         self.player_pos_x = random.randint(area_x, area_y)
         self.player_pos_y = random.randint(area_x, area_y)
         self.player = pygame.draw.rect(screen, self.colour_player,
                                        [self.player_pos_x, self.player_pos_y, player_size, player_size])
 
+    # Initialise the point
     def point_init(self):
         self.point_pos_x = random.randint(area_x, area_y)
         self.point_pos_y = random.randint(area_x, area_y)
         self.point = pygame.draw.rect(screen, self.colour_point,
                                       [self.point_pos_x, self.point_pos_y, point_size, point_size])
 
+    # Updating the snake on the new background
     def update(self):
         self.point = pygame.draw.rect(screen, self.colour_point,
                                       [self.point_pos_x, self.point_pos_y, point_size, point_size])
         self.player = pygame.draw.rect(screen, self.colour_player,
                                        [self.player_pos_x, self.player_pos_y, player_size, player_size])
 
+    # Every snake rectangle changes it's position
     def update_snake(self):
         for XnY in self.snakeList:
             self.player = pygame.draw.rect(screen, self.colour_player, [XnY[0], XnY[1], player_size, player_size])
 
-    def update_background(self):
-        screen.fill(colour_back)
-        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, 0, width, heigth_fence))
-        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, height - heigth_fence, width, heigth_fence))
-
-        pygame.draw.rect(screen, colour_rec, pygame.Rect(0, heigth_fence, heigth_fence, height))
-        pygame.draw.rect(screen, colour_rec, pygame.Rect(height - heigth_fence, 0, heigth_fence, height))
-
-        font = pygame.font.SysFont("comicsans", 20)
-        text = font.render(("Points: " + str(self.snakeLength)), True, (255, 255, 255))
-        screen.blit(text, (10, 10))
-
 
 pygame.init()
-height = 800
-width = 800
+# Size of the Window (Height & Width)
+size = 800
 heigth_fence = 40
+point_size = 60
+player_size = 30
 
 colour_rec = (96, 0, 0)
 colour_back = (0, 144, 0)
 
-player_size = 30
-point_size = 60
-area_x = heigth_fence + player_size
-area_y = height - heigth_fence - player_size
+area_x = heigth_fence + point_size
+area_y = size - heigth_fence - point_size
 
-screen = pygame.display.set_mode((height, width))
+screen = pygame.display.set_mode((size, size))
 pygame.display.set_caption("Snake")
 Snake()
