@@ -7,8 +7,8 @@ class Snake:
         self.snakeList = []
         self.snakeLength = 0
         self.clock = pygame.time.Clock()
-        self.colour_point = (187, 75, 129)
-        self.colour_player = (80, 128, 167)
+        self.colour_point = (41, 153, 184)
+        self.colour_player = (198, 119, 80)
         self.update_background()
         self.player_pos_x = 0
         self.player_pos_y = 0
@@ -88,7 +88,7 @@ class Snake:
         screen.blit(image_rock, (200, 200))
         screen.blit(image_grass, (400, 500))
 
-        font = pygame.font.SysFont("comicsans", 20)
+        font = pygame.font.SysFont("comicsans", 35)
         text = font.render(("Points: " + str(self.snakeLength)), True, (255, 255, 255))
         screen.blit(text, (10, 10))
 
